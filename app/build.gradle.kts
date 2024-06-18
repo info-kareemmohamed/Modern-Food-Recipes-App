@@ -55,5 +55,10 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
     implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
 
+    // ShimmerRecyclerView
+    implementation("com.facebook.shimmer:shimmer:0.5.0")
+
+
+
 
 }
