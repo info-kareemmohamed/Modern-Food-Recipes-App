@@ -34,7 +34,7 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    buildFeatures{
+    buildFeatures {
         viewBinding = true
 
         dataBinding = true
@@ -58,7 +58,7 @@ dependencies {
     // ShimmerRecyclerView
     implementation("com.facebook.shimmer:shimmer:0.5.0")
 
-
+    implementation("com.google.android.material:material:1.12.0")
 
 
 }
