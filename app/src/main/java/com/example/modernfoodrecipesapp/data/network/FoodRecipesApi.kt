@@ -1,11 +1,12 @@
-package com.example.modernfoodrecipesapp
+package com.example.modernfoodrecipesapp.data.network
 
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.QueryMap
 
-interface FoodRecipes {
+interface FoodRecipesApi  {
     @GET("/recipes/complexSearch")
     suspend fun getRecipes(
         @QueryMap queries: Map<String, String>
-    )
+    ):Response<Object>
 }
