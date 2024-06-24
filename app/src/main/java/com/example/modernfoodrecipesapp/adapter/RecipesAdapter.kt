@@ -3,10 +3,12 @@ package com.example.modernfoodrecipesapp.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.modernfoodrecipesapp.databinding.RecipesRowLayoutBinding
 import com.example.modernfoodrecipesapp.model.FoodRecipe
 import com.example.modernfoodrecipesapp.model.Result
+import com.example.modernfoodrecipesapp.util.RecipesDiffUtil
 
 class RecipesAdapter() : RecyclerView.Adapter<RecipesAdapter.MyViewHolder>() {
     private var list = emptyList<Result>()
@@ -43,7 +45,9 @@ class RecipesAdapter() : RecyclerView.Adapter<RecipesAdapter.MyViewHolder>() {
     }
 
     fun setData(newData: FoodRecipe) {
+        val recipeDiffUtil = RecipesDiffUtil(list, newData.results)
+        val diffUtilResult = DiffUtil.calculateDiff(recipeDiffUtil)
         list = newData.results
-        notifyDataSetChanged()
+        diffUtilResult.dispatchUpdatesTo(this)
     }
 }
