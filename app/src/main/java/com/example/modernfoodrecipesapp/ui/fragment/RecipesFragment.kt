@@ -89,6 +89,7 @@ class RecipesFragment : Fragment() {
                         response.message.toString(),
                         Toast.LENGTH_SHORT
                     ).show()
+
                 }
                 is NetworkResult.Loading -> {
                     startShimmer()
