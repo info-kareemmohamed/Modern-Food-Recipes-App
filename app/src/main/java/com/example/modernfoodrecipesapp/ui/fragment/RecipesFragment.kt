@@ -1,12 +1,14 @@
 package com.example.modernfoodrecipesapp.ui.fragment
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.modernfoodrecipesapp.R
@@ -24,6 +26,7 @@ import com.example.modernfoodrecipesapp.viewmodel.MainViewModel
 import com.example.modernfoodrecipesapp.viewmodel.RecipesViewModel
 import com.facebook.shimmer.ShimmerFrameLayout
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class RecipesFragment : Fragment() {
@@ -40,6 +43,7 @@ class RecipesFragment : Fragment() {
         mainViewModel = ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
         recipesViewModel = ViewModelProvider(requireActivity()).get(RecipesViewModel::class.java)
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -47,7 +51,8 @@ class RecipesFragment : Fragment() {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_recipes, container, false)
         setupRecyclerView()
-        loadData()
+        readDatabase()
+
         return view
 
     }
@@ -60,6 +65,20 @@ class RecipesFragment : Fragment() {
         startShimmer()
     }
 
+
+    private fun readDatabase() {
+        lifecycleScope.launch {
+            mainViewModel.readRecipes.observe(viewLifecycleOwner, { database ->
+                if (database.isNotEmpty()) {
+                    Log.d("RecipesFragment", "readDatabase called!")
+                    myAdapter.setData(database[0].foodRecipe)
+                    stopShimmer()
+                } else {
+                    loadData()
+                }
+            })
+        }
+    }
 
     private fun applyQueries(): HashMap<String, String> {
         val queries: HashMap<String, String> = HashMap()
@@ -82,8 +101,10 @@ class RecipesFragment : Fragment() {
                     stopShimmer()
                     response.data?.let { myAdapter.setData(it) }
                 }
+
                 is NetworkResult.Error -> {
                     stopShimmer()
+                    loadDataFromCache()
                     Toast.makeText(
                         requireContext(),
                         response.message.toString(),
@@ -91,10 +112,21 @@ class RecipesFragment : Fragment() {
                     ).show()
 
                 }
+
                 is NetworkResult.Loading -> {
                     startShimmer()
                 }
             }
+        }
+    }
+
+    private fun loadDataFromCache() {
+        lifecycleScope.launch {
+            mainViewModel.readRecipes.observe(viewLifecycleOwner, { database ->
+                if (database.isNotEmpty()) {
+                    myAdapter.setData(database[0].foodRecipe)
+                }
+            })
         }
     }
 
