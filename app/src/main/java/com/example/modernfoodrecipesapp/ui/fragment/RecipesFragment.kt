@@ -22,6 +22,7 @@ import com.example.modernfoodrecipesapp.util.Constant.Companion.QUERY_FILL_INGRE
 import com.example.modernfoodrecipesapp.util.Constant.Companion.QUERY_NUMBER
 import com.example.modernfoodrecipesapp.util.Constant.Companion.QUERY_TYPE
 import com.example.modernfoodrecipesapp.util.NetworkResult
+import com.example.modernfoodrecipesapp.util.observeOnce
 import com.example.modernfoodrecipesapp.viewmodel.MainViewModel
 import com.example.modernfoodrecipesapp.viewmodel.RecipesViewModel
 import com.facebook.shimmer.ShimmerFrameLayout
@@ -68,7 +69,7 @@ class RecipesFragment : Fragment() {
 
     private fun readDatabase() {
         lifecycleScope.launch {
-            mainViewModel.readRecipes.observe(viewLifecycleOwner, { database ->
+            mainViewModel.readRecipes.observeOnce(viewLifecycleOwner, { database ->
                 if (database.isNotEmpty()) {
                     Log.d("RecipesFragment", "readDatabase called!")
                     myAdapter.setData(database[0].foodRecipe)
@@ -94,6 +95,7 @@ class RecipesFragment : Fragment() {
     }
 
     private fun loadData() {
+        Log.d("RecipesFragment", "requestApiData called!")
         mainViewModel.getRecipes(recipesViewModel.applyQueries())
         mainViewModel.recipesResponse.observe(viewLifecycleOwner) { response ->
             when (response) {
