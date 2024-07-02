@@ -1,4 +1,4 @@
-package com.example.modernfoodrecipesapp.ui.fragment
+package com.example.modernfoodrecipesapp.ui.fragment.favorites
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
