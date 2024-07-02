@@ -10,10 +10,8 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.modernfoodrecipesapp.R
 import com.example.modernfoodrecipesapp.adapter.RecipesAdapter
-import com.example.modernfoodrecipesapp.util.Constant
+import com.example.modernfoodrecipesapp.databinding.FragmentRecipesBinding
 import com.example.modernfoodrecipesapp.util.Constant.Companion.API_KEY
 import com.example.modernfoodrecipesapp.util.Constant.Companion.QUERY_ADD_RECIPE_INFORMATION
 import com.example.modernfoodrecipesapp.util.Constant.Companion.QUERY_API_KEY
@@ -25,18 +23,16 @@ import com.example.modernfoodrecipesapp.util.NetworkResult
 import com.example.modernfoodrecipesapp.util.observeOnce
 import com.example.modernfoodrecipesapp.viewmodel.MainViewModel
 import com.example.modernfoodrecipesapp.viewmodel.RecipesViewModel
-import com.facebook.shimmer.ShimmerFrameLayout
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class RecipesFragment : Fragment() {
+    private var _binding: FragmentRecipesBinding? = null
+    private val binding get() = _binding!!
     private lateinit var recipesViewModel: RecipesViewModel
     private lateinit var mainViewModel: MainViewModel
     private val myAdapter by lazy { RecipesAdapter() }
-    private lateinit var shimmerFrameLayout: ShimmerFrameLayout
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var view: View
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,19 +46,20 @@ class RecipesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_recipes, container, false)
+        _binding = FragmentRecipesBinding.inflate(inflater, container, false)
+        binding.lifecycleOwner = this
+        binding.mainViewModel = mainViewModel
         setupRecyclerView()
         readDatabase()
 
-        return view
+        return binding.root
 
     }
 
 
     private fun setupRecyclerView() {
-        recyclerView = view.findViewById<RecyclerView>(R.id.recipes_recyclerview)
-        recyclerView.adapter = myAdapter
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.recipesRecyclerview.adapter = myAdapter
+        binding.recipesRecyclerview.layoutManager = LinearLayoutManager(requireContext())
         startShimmer()
     }
 
@@ -133,15 +130,14 @@ class RecipesFragment : Fragment() {
     }
 
     private fun startShimmer() {
-        shimmerFrameLayout = view.findViewById(R.id.shimmer_recyclerview)
-        shimmerFrameLayout.visibility = View.VISIBLE
-        shimmerFrameLayout.startShimmer()
+        binding.shimmerRecyclerview.visibility = View.VISIBLE
+        binding.shimmerRecyclerview.startShimmer()
     }
 
     private fun stopShimmer() {
-        shimmerFrameLayout.stopShimmer()
-        shimmerFrameLayout.visibility = View.GONE
-        recyclerView.visibility = View.VISIBLE
+        binding.shimmerRecyclerview.stopShimmer()
+        binding.shimmerRecyclerview.visibility = View.GONE
+        binding.recipesRecyclerview.visibility = View.VISIBLE
     }
 
 }
