@@ -22,6 +22,7 @@ import com.example.modernfoodrecipesapp.util.Constant.Companion.QUERY_DIET
 import com.example.modernfoodrecipesapp.util.Constant.Companion.QUERY_FILL_INGREDIENTS
 import com.example.modernfoodrecipesapp.util.Constant.Companion.QUERY_NUMBER
 import com.example.modernfoodrecipesapp.util.Constant.Companion.QUERY_TYPE
+import com.example.modernfoodrecipesapp.util.NetworkListener
 import com.example.modernfoodrecipesapp.util.NetworkResult
 import com.example.modernfoodrecipesapp.util.observeOnce
 import com.example.modernfoodrecipesapp.viewmodel.MainViewModel
@@ -37,6 +38,7 @@ class RecipesFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var recipesViewModel: RecipesViewModel
     private lateinit var mainViewModel: MainViewModel
+    private lateinit var networkListener: NetworkListener
     private val myAdapter by lazy { RecipesAdapter() }
 
 
@@ -56,10 +58,24 @@ class RecipesFragment : Fragment() {
         binding.mainViewModel = mainViewModel
         setupRecyclerView()
         readDatabase()
-        binding.recipesFab.setOnClickListener{
-            findNavController().navigate(R.id.action_recipesFragment_to_recipesBottomSheet)
+        lifecycleScope.launch {
+            networkListener = NetworkListener()
+            networkListener.checkNetworkAvailability(requireContext())
+                .collect { status ->
+                    Log.d("NetworkListener", status.toString())
+                    recipesViewModel.networkStatus = status
+                    recipesViewModel.showNetworkStatus()
+                    readDatabase()
+                }
         }
 
+        binding.recipesFab.setOnClickListener {
+            if (recipesViewModel.networkStatus) {
+                findNavController().navigate(R.id.action_recipesFragment_to_recipesBottomSheet)
+            } else {
+                recipesViewModel.showNetworkStatus()
+            }
+        }
         return binding.root
 
     }
